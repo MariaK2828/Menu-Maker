@@ -1,0 +1,106 @@
+# Author: Maria Konovalov
+# Date: January 22nd 2023
+
+# To run:
+# m = MenuMaker() 
+# then after you name your restaurant:
+# m.run()
+
+# imports the Pillow Library
+from PIL import Image, ImageDraw
+
+class MenuMaker:
+    
+    def __init__(self):
+        # intializes empty lists 
+        self.food = []
+        self.price = {}
+        # gets name of restaurant from user
+        self.name = input("What is your cafe called? ")
+    
+    # function to display unordered menu
+    def display_menu(self):    
+        menu_img = Image.new('RGB',(35 + len(self.name) * 10, 20 + len(self.food)* 10), color = (0, 64, 255))
+
+        d = ImageDraw.Draw(menu_img)
+        # dimensions of image
+        d.text((10,5), self.name + "'s Menu", fill = (255,255,255))
+        
+        # count makes sure that the food items are printed on different lines
+        count = 1
+        for i in self.price:
+            #print(x + " - " + "$" + str(ordered_menu.get(x)))
+            d.text((20,5 + 10 * count), str(i) + " - " + self.price.get(i), fill = (255,255,255))
+            count += 1
+        menu_img.save('menu.png')
+        
+        # displays image
+        open_img = Image.open('menu.png')
+        open_img.show()
+    
+    # function to let the user create a menu with different food items
+    def create_menu(self):
+        # loop runs as long as the user wants to enter more food items
+        cont = "y"
+        while cont == "y":
+            food_item = input("Please enter a food item that you want to put on the menu: ")
+            # adds food item to list 
+            self.food.append(food_item)
+            food_price = int(input(" How much does " + food_item + " cost: "))
+            # adds price to a dictionary with the corresponding food item
+            self.price[food_item] = "$" + str(food_price)
+            
+            # user input asks user whether they want to continue
+            cont = input("Would you like to add more food items to your menu (y/n)?: ")
+            print("\n")
+    
+    # function to order the menu   
+    def order(self):
+        ordered = input("Would you like to order the menu from cheapest to most expensive (y/n)?: ")
+        # if the user wants to order the menu
+        if ordered == "y":
+            price_list = []
+            for i in self.price:
+                # the program removes the $ sign from the food item so the integer can be manipulated 
+                x = self.price.get(i).strip("$")
+                price_list.append(int(x))
+            
+            # sorts the prices
+            price_list.sort()
+            
+            ordered_menu = {}
+            for i in price_list:
+                # This loop matches the order of the prices to the fiood item, so then the food items
+                # become ordered by price
+                for food in self.price.keys():
+                    # if the price corresponds to the food item
+                    if self.price[food] == "$" + str(i):
+                        # the key value pair is added to the dictionary
+                        ordered_menu[food] = i
+            
+            # creates ordered menu image
+            menu_img = Image.new('RGB',(90 + len(self.name) * 10,30 + len(price_list)* 10), color = (255, 0, 127))
+
+            d = ImageDraw.Draw(menu_img)
+            d.text((10,5), self.name + "'s Menu (Ordered)", fill = (255,255,255))
+            
+            count = 1
+            for x in ordered_menu:
+                # the count makes sure that each food item is printed on a different line
+                d.text((20,5 + 10 * count), x + " - " + "$" + str(ordered_menu.get(x)), fill = (255,255,255))
+                count += 1
+            menu_img.save('ordered_menu.png')
+            
+            # the ordered menu is displayed
+            open_img = Image.open('ordered_menu.png')
+            open_img.show()
+        else:
+            # if the user does not want their menu to be ordered then the unordered menu is printed instead
+            self.display_menu()
+                
+    # master function thet executes all of the functions above
+    def run(self):
+        self.create_menu()
+        self.order()
+        # thank you message
+        print("Thank you for using Menu Maker to create your menu! ")
